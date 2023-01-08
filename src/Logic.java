@@ -11,17 +11,18 @@ public class Logic {
 
     private static List<File> fileNames = new ArrayList<File>();
     private static List<RequireFileClass> requireFileNames = new ArrayList<RequireFileClass>();
+
+    // Here is the variable to put the base directory
     final public static String baseDirString = "D:/codeprojects/FileManager";
+    // Here is the variable to put the base directory
 
     public static void ReadFiles(File baseDirFile) {
-
         for (File i : baseDirFile.listFiles()) {
             if (i.isDirectory()) {
                 ReadFiles(i);
             } else {
                 if (getFileExtension(i.getName()).equals("txt")) {
                     String parentDir = baseDirFile.getParentFile().getName();
-
                     if (parentDir.equals("FileManager")) {
                         System.out.println(baseDirFile.getName() + "/" + i.getName());
                     } else {
@@ -74,12 +75,29 @@ public class Logic {
                     i.setIsCycle(false);
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
 
         return false;
+    }
+
+    public static List<RequireFileClass> generateRequireSortedList() {
+        var requireSortedList = new ArrayList<RequireFileClass>();
+        for (RequireFileClass i : requireFileNames) {
+            if (!i.getIsCycle()) {
+                requireSortedList.add(i);
+            }
+        }
+        requireSortedList.sort(RequireFileClass::compareTo);
+        return requireSortedList;
+    }
+
+    public static void printFileList(List<RequireFileClass> fileList) {
+        System.out.println("\nSorted list of files:\n");
+        for (var i : fileList) {
+            System.out.println(i.getName().replace('\\', '/'));
+        }
     }
 
     public static void AnalyzeScheme() {

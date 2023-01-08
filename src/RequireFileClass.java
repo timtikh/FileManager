@@ -20,7 +20,6 @@ public class RequireFileClass implements Comparable {
         this.file = file;
         this.canonicalPath = file.getAbsolutePath();
         this.name = canonicalPath.substring(baseDir.length() + 1);
-
     }
 
     // standard getters, setters and toString
@@ -65,6 +64,15 @@ public class RequireFileClass implements Comparable {
     @Override
     public int compareTo(Object o) {
         RequireFileClass e = (RequireFileClass) o;
+        try {
+            if (this.getRequiredFilesList().contains(e)) {
+                return 1;
+            } else if (e.getRequiredFilesList().contains(this)) {
+                return -1;
+            }
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
         return this.getRequireCount() - e.getRequireCount();
     }
 

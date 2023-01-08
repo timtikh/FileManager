@@ -14,18 +14,20 @@ public class Main {
             System.exit(1);
         } else {
             System.out.println("The base directory exists.");
-
+            System.out.println("Files found in base auditory:");
             Logic.ReadFiles(baseDirFile);
+
             Logic.initRequireFileNames();
             if (Logic.checkIfBaseDirCyclic()) {
                 System.out.println("The base directory is cyclic. Exiting...");
                 System.exit(1);
             }
+            Logic.printFileList(Logic.generateRequireSortedList());
             // Logic.CountFileRequire();
             // Logic.CheckFileRequireCycle();
             // Logic.AnalyzeScheme();
             // Logic.WriteOutput();
-            System.out.println("The final text will be in file with name: " + baseDirString + "/output.txt");
+            System.out.println("\nThe final text will be in file with name: " + baseDirString + "/output.txt");
         }
     }
 }
