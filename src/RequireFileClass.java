@@ -87,6 +87,7 @@ public class RequireFileClass implements Comparable {
     public boolean checkIfFileCyclic(List<RequireFileClass> requires) {
         for (RequireFileClass i : requires) {
             if (this.equals(i)) {
+                System.out.println("Cyclic file: " + this.getName());
                 this.setIsCycle(true);
                 return true;
             }

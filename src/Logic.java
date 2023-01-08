@@ -65,12 +65,12 @@ public class Logic {
         // check if the file has a cycle
         // if it has a cycle, set the isCycle variable to true and return true
         // else set the isCycle variable to false and continue
-
+        boolean isCycle = false;
         for (RequireFileClass i : requireFileNames) {
             try {
                 if (i.checkIfFileCyclic(i.getRequiredFilesList())) {
                     i.setIsCycle(true);
-                    return true;
+                    isCycle = true;
                 } else {
                     i.setIsCycle(false);
                 }
@@ -79,7 +79,7 @@ public class Logic {
             }
         }
 
-        return false;
+        return isCycle;
     }
 
     public static List<RequireFileClass> generateRequireSortedList() {
