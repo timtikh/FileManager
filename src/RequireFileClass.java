@@ -16,9 +16,11 @@ public class RequireFileClass implements Comparable {
     private String canonicalPath = "";
 
     public RequireFileClass(File file) {
+        String baseDir = Logic.baseDirString;
         this.file = file;
-        this.name = file.getName();
         this.canonicalPath = file.getAbsolutePath();
+        this.name = canonicalPath.substring(baseDir.length() + 1);
+
     }
 
     // standard getters, setters and toString
@@ -75,31 +77,28 @@ public class RequireFileClass implements Comparable {
     };
 
     public boolean checkIfFileCyclic(List<RequireFileClass> requires) {
-
         for (RequireFileClass i : requires) {
             if (this.equals(i)) {
                 this.setIsCycle(true);
                 return true;
             }
+        }
+        var inRequires = new ArrayList<RequireFileClass>();
+        for (RequireFileClass i : requires) {
             try {
-                requires.addAll(i.getRequiredFilesList());
-                requires.remove(i);
-                if (i.checkIfFileCyclic(i.getRequiredFilesList())) {
-                    this.setIsCycle(true);
-                    return true;
-                }
-                requires.add(i);
+                inRequires.addAll(i.getRequiredFilesList());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+
         return false;
     }
 
     public List<RequireFileClass> getRequiredFilesList() throws IOException {
         // print plain string
 
-        String expected_value = "require \'";
+        String expected_value = "require ‘";
         List<RequireFileClass> requiredFiles = new ArrayList<RequireFileClass>();
         Path path = Paths.get(this.getCanonicalPath());
         BufferedReader reader = Files.newBufferedReader(path);
@@ -109,13 +108,50 @@ public class RequireFileClass implements Comparable {
         while ((line = reader.readLine()) != null) {
             if (line.contains(expected_value)) {
                 String requiredFileName = line.substring(line.indexOf(expected_value) + expected_value.length(),
-                        line.indexOf(".txt") + 4);
+                        line.indexOf("’"));
+                requiredFileName += ".txt";
+                requiredFileName = requiredFileName.replace('/', '\\');
                 for (RequireFileClass i : Logic.getRequireFileNames()) {
                     if (i.getName().equals(requiredFileName)) {
                         requiredFiles.add(i);
+                        count++;
                     }
                 }
-                count++;
+            }
+        }
+        var oldRequiredFiles = new ArrayList<RequireFileClass>();
+        oldRequiredFiles.addAll(requiredFiles);
+        for (RequireFileClass i : requiredFiles) {
+            oldRequiredFiles.addAll(i.getRequiredFilesList(requiredFiles));
+        }
+
+        this.setRequireCount(count);
+        reader.close();
+        return oldRequiredFiles;
+    }
+
+    public List<RequireFileClass> getRequiredFilesList(List<RequireFileClass> requires) throws IOException {
+        // print plain string
+
+        String expected_value = "require ‘";
+        List<RequireFileClass> requiredFiles = new ArrayList<RequireFileClass>();
+        Path path = Paths.get(this.getCanonicalPath());
+        BufferedReader reader = Files.newBufferedReader(path);
+        String line = null;
+
+        int count = 0;
+        while ((line = reader.readLine()) != null) {
+            if (line.contains(expected_value)) {
+                String requiredFileName = line.substring(line.indexOf(expected_value) + expected_value.length(),
+                        line.indexOf("’"));
+                requiredFileName += ".txt";
+                requiredFileName = requiredFileName.replace('/', '\\');
+                for (RequireFileClass i : Logic.getRequireFileNames()) {
+                    if (i.getName().equals(requiredFileName)) {
+                        requiredFiles.add(i);
+                        count++;
+                    }
+                }
             }
         }
         this.setRequireCount(count);

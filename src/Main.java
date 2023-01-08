@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         System.out.println("Welcome to the file manager!");
         // make a global variable to store the current directory
-        final String baseDirString = "D://codeprojects//FileManager"; // or whatever the default is
+        final String baseDirString = "D:/codeprojects/FileManager"; // or whatever the default is
 
         File baseDirFile = new File(baseDirString);
         if (!baseDirFile.exists()) {
@@ -25,7 +25,7 @@ public class Main {
             // Logic.CheckFileRequireCycle();
             // Logic.AnalyzeScheme();
             // Logic.WriteOutput();
-            System.out.println("The final text will be in file with name: " + baseDirString + "//output.txt");
+            System.out.println("The final text will be in file with name: " + baseDirString + "/output.txt");
         }
     }
 }

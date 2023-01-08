@@ -11,6 +11,7 @@ public class Logic {
 
     private static List<File> fileNames = new ArrayList<File>();
     private static List<RequireFileClass> requireFileNames = new ArrayList<RequireFileClass>();
+    final public static String baseDirString = "D:/codeprojects/FileManager";
 
     public static void ReadFiles(File baseDirFile) {
 
