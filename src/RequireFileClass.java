@@ -8,12 +8,22 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * This class is used to store the name of the file and the list of files that
+ * are required by this file.
+ * Java class is too simple for my aims, so I decided to create this class.
+ */
 public class RequireFileClass implements Comparable {
     private String name = "";
     private File file;
     private int requireCount = -1;
     private boolean isCycle = true;
     private String canonicalPath = "";
+
+    /**
+     * @param file - taking java file object and creating new object on its base
+     *             a simple constructor
+     */
 
     public RequireFileClass(File file) {
         String baseDir = Logic.baseDirString;
@@ -22,7 +32,7 @@ public class RequireFileClass implements Comparable {
         this.name = canonicalPath.substring(baseDir.length() + 1);
     }
 
-    // standard getters, setters and toString
+    // standard getters, setters
 
     public String getName() {
         return name;
@@ -56,6 +66,8 @@ public class RequireFileClass implements Comparable {
         return canonicalPath;
     }
 
+    // comparable interface
+
     @Override
     public boolean equals(Object obj) {
         return ((RequireFileClass) obj).getName().equals(getName());
@@ -84,6 +96,12 @@ public class RequireFileClass implements Comparable {
         }
     };
 
+    /**
+     * checking file on cycles using for each loop
+     * 
+     * @param requires - list of files that are required by this file
+     * @return - if the file has a cycle, return true, else return false
+     */
     public boolean checkIfFileCyclic(List<RequireFileClass> requires) {
         for (RequireFileClass i : requires) {
             if (this.equals(i)) {
@@ -92,31 +110,26 @@ public class RequireFileClass implements Comparable {
                 return true;
             }
         }
-        var inRequires = new ArrayList<RequireFileClass>();
-        for (RequireFileClass i : requires) {
-            try {
-                inRequires.addAll(i.getRequiredFilesList());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         return false;
     }
 
+    /**
+     * checking cycles using recursion
+     * 
+     * @return - list of files that are required by this file
+     * @throws IOException - if the file is not found, throw an exception
+     */
     public List<RequireFileClass> getRequiredFilesList() throws IOException {
-        // print plain string
-
-        String expected_value = "require ‘";
+        String expectedValue = "require ‘";
         List<RequireFileClass> requiredFiles = new ArrayList<RequireFileClass>();
         Path path = Paths.get(this.getCanonicalPath());
         BufferedReader reader = Files.newBufferedReader(path);
         String line = null;
-
         int count = 0;
+
         while ((line = reader.readLine()) != null) {
-            if (line.contains(expected_value)) {
-                String requiredFileName = line.substring(line.indexOf(expected_value) + expected_value.length(),
+            if (line.contains(expectedValue)) {
+                String requiredFileName = line.substring(line.indexOf(expectedValue) + expectedValue.length(),
                         line.indexOf("’"));
                 requiredFileName += ".txt";
                 requiredFileName = requiredFileName.replace('/', '\\');
@@ -139,19 +152,25 @@ public class RequireFileClass implements Comparable {
         return oldRequiredFiles;
     }
 
+    /**
+     * checking cycles using recursion
+     * 
+     * @param requires - list of files that are required by this file already
+     * @return - list of files that are required by this file
+     * @throws IOException - if the file is not found, throw an exception
+     */
     public List<RequireFileClass> getRequiredFilesList(List<RequireFileClass> requires) throws IOException {
-        // print plain string
 
-        String expected_value = "require ‘";
+        String expectedValue = "require ‘";
         List<RequireFileClass> requiredFiles = new ArrayList<RequireFileClass>();
         Path path = Paths.get(this.getCanonicalPath());
         BufferedReader reader = Files.newBufferedReader(path);
         String line = null;
-
         int count = 0;
+
         while ((line = reader.readLine()) != null) {
-            if (line.contains(expected_value)) {
-                String requiredFileName = line.substring(line.indexOf(expected_value) + expected_value.length(),
+            if (line.contains(expectedValue)) {
+                String requiredFileName = line.substring(line.indexOf(expectedValue) + expectedValue.length(),
                         line.indexOf("’"));
                 requiredFileName += ".txt";
                 requiredFileName = requiredFileName.replace('/', '\\');
@@ -166,28 +185,6 @@ public class RequireFileClass implements Comparable {
         this.setRequireCount(count);
         reader.close();
         return requiredFiles;
-    }
-
-    public static void CountFileRequire() throws IOException {
-        // print plain string
-        System.out.println("\n");
-        for (File i : Logic.getFileNames()) {
-            String expected_value = "require";
-
-            Path path = Paths.get(i.getAbsolutePath());
-            BufferedReader reader = Files.newBufferedReader(path);
-            var fileStrings = reader.lines();
-            int countFileRequire = 0;
-            for (String line : (Iterable<String>) fileStrings::iterator) {
-                if (line.contains(expected_value)) {
-                    countFileRequire++;
-                }
-            }
-            reader.close();
-            System.out.println(i.getName() + " has " + countFileRequire + " require(s)");
-
-        }
-
     }
 
 }
