@@ -26,7 +26,7 @@ public class Main {
             // Logic.CountFileRequire();
             // Logic.CheckFileRequireCycle();
             // Logic.AnalyzeScheme();
-            // Logic.WriteOutput();
+            Logic.WriteResultToFile();
             System.out.println("\nThe final text will be in file with name: " + baseDirString + "/output.txt");
         }
     }

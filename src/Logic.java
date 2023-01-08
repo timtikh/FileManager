@@ -100,15 +100,26 @@ public class Logic {
         }
     }
 
-    public static void AnalyzeScheme() {
-        // analyze the file names and file extensions
-        // and store the file names in a list
-        // and store the file extensions in a list
-        // and store the file paths in a list
-    }
+    public static void WriteResultToFile() {
+        var requireSortedList = generateRequireSortedList();
+        var path = Paths.get(baseDirString + "/output.txt");
+        try (var writer = Files.newBufferedWriter(path)) {
+            for (var i : requireSortedList) {
+                // write from file i to output.txt
+                var path2 = Paths.get(baseDirString + "/" + i.getName());
+                var reader = Files.newBufferedReader(path2);
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+                writer.newLine();
+                reader.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-    public static void WriteOutput() {
-        // write the output to a file
     }
 
 }
