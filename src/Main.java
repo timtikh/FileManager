@@ -16,6 +16,11 @@ public class Main {
             System.out.println("The base directory exists.");
 
             Logic.ReadFiles(baseDirFile);
+            Logic.initRequireFileNames();
+            if (Logic.checkIfBaseDirCyclic()) {
+                System.out.println("The base directory is cyclic. Exiting...");
+                System.exit(1);
+            }
             // Logic.CountFileRequire();
             // Logic.CheckFileRequireCycle();
             // Logic.AnalyzeScheme();

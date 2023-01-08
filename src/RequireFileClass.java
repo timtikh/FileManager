@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class RequireFileClass implements Comparable {
     private String name = "";
@@ -72,8 +74,53 @@ public class RequireFileClass implements Comparable {
         }
     };
 
-    public static void CheckFileRequireCycle() {
-        // check if the file requires a cycle
+    public boolean checkIfFileCyclic(List<RequireFileClass> requires) {
+
+        for (RequireFileClass i : requires) {
+            if (this.equals(i)) {
+                this.setIsCycle(true);
+                return true;
+            }
+            try {
+                requires.addAll(i.getRequiredFilesList());
+                requires.remove(i);
+                if (i.checkIfFileCyclic(i.getRequiredFilesList())) {
+                    this.setIsCycle(true);
+                    return true;
+                }
+                requires.add(i);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    public List<RequireFileClass> getRequiredFilesList() throws IOException {
+        // print plain string
+
+        String expected_value = "require \'";
+        List<RequireFileClass> requiredFiles = new ArrayList<RequireFileClass>();
+        Path path = Paths.get(this.getCanonicalPath());
+        BufferedReader reader = Files.newBufferedReader(path);
+        String line = null;
+
+        int count = 0;
+        while ((line = reader.readLine()) != null) {
+            if (line.contains(expected_value)) {
+                String requiredFileName = line.substring(line.indexOf(expected_value) + expected_value.length(),
+                        line.indexOf(".txt") + 4);
+                for (RequireFileClass i : Logic.getRequireFileNames()) {
+                    if (i.getName().equals(requiredFileName)) {
+                        requiredFiles.add(i);
+                    }
+                }
+                count++;
+            }
+        }
+        this.setRequireCount(count);
+        reader.close();
+        return requiredFiles;
     }
 
     public static void CountFileRequire() throws IOException {

@@ -35,6 +35,12 @@ public class Logic {
 
     }
 
+    public static void initRequireFileNames() {
+        for (File i : fileNames) {
+            requireFileNames.add(new RequireFileClass(i));
+        }
+    }
+
     public static String getFileExtension(String fullName) {
         if (fullName == null)
             throw new IllegalArgumentException("fileName cannot be null");
@@ -48,23 +54,31 @@ public class Logic {
         return fileNames;
     }
 
-    public static void CountFileRequire() throws IOException {
-        // print plain string
-        System.out.println("\n");
-        for (File i : fileNames) {
-            String expected_value = "require";
+    // get requireFileNames list
+    public static List<RequireFileClass> getRequireFileNames() {
+        return requireFileNames;
+    }
 
-            Path path = Paths.get(i.getAbsolutePath());
-            BufferedReader reader = Files.newBufferedReader(path);
-            String line = null;
-            int count = 0;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains(expected_value)) {
-                    count++;
+    public static boolean checkIfBaseDirCyclic() {
+        // check if the file has a cycle
+        // if it has a cycle, set the isCycle variable to true and return true
+        // else set the isCycle variable to false and continue
+
+        for (RequireFileClass i : requireFileNames) {
+            try {
+                if (i.checkIfFileCyclic(i.getRequiredFilesList())) {
+                    i.setIsCycle(true);
+                    return true;
+                } else {
+                    i.setIsCycle(false);
                 }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-            System.out.println(i.getName() + " has " + count + " require statements.");
         }
+
+        return false;
     }
 
     public static void AnalyzeScheme() {
